@@ -1,4 +1,4 @@
-﻿
+
 // =========================
 // FIREBASE IMPORTS
 // =========================
@@ -567,10 +567,7 @@ function loadStories(){
 }
 
 // =========================
-// REELS
-// =========================
-// =========================
-// LOAD REELS FROM FIRESTORE
+// REELS & LOAD REELS
 // =========================
 
 // =========================
@@ -877,7 +874,8 @@ function loadReels() {
 <div class="absolute bottom-24 right-4 z-30">
 
   <button
-    onclick="toggleMenu('${reelId}')"
+    onclick="toggleReelMenu('${reelId}')"
+
     class="bg-black/50 px-3 py-2 rounded-full text-xl"
   >
     ⋮
@@ -1621,7 +1619,8 @@ window.openComments = async function(reelId){
 };    
 
 
-window.toggleMenu = function(reelId){
+window.toggleReelMenu = function(reelId){
+
 
   const menu =
     document.getElementById(
