@@ -566,13 +566,7 @@ function loadStories(){
 
 }
 
-// =========================
-// REELS & LOAD REELS
-// =========================
 
-// =========================
-// ONLINE STATUS
-// =========================
 async function updateOnlineStatus(status){
 
   const user = auth.currentUser;
