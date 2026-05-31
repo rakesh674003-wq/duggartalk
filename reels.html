@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" 
+content="width=device-width, initial-scale=1.0"/>
+
+  <title>DuggarTalk Reels</title>
+
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+
+  
+  <style>
+
+html,
+body{
+  margin:0;
+  padding:0;
+  background:black;
+  overflow:hidden;
+  color:white;
+  font-family:sans-serif;
+}
+
+#reelsContainer{
+  height:100vh;
+  width:100%;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  background:black;
+}
+
+
+.reel-item{
+  position:relative;
+  height:100vh;
+  width:100%;
+  scroll-snap-align:start;
+  background:black;
+}
+
+.reel-video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  background:black;
+  position:absolute;
+  top:0;
+  left:0;
+}
+
+</style>  
+
+
+
+</head>
+
+
+<body>
+
+
+  
+<button
+  onclick="history.back()"
+  class="fixed top-4 left-4 z-50 bg-[#1E293B] text-white px-4 py-2 rounded-2xl font-bold"
+>
+  ← Back
+</button>
+
+<button
+  onclick="openReelModal()"
+  class="fixed top-4 right-4 z-50 bg-yellow-400 text-black px-4 py-2 rounded-2xl font-bold"
+>
+  + Upload
+</button>
+
+  <!-- REELS CONTAINER -->
+
+  <div id="reelsContainer">
+</div>
+
+
+  <!-- UPLOAD MODAL -->
+
+  <div
+    id="reelUploadModal"
+    class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+  >
+
+
+    <div class="bg-[#0f172a] p-5 rounded-3xl w-[90%] max-w-md">
+
+
+      <h2 class="text-2xl font-bold text-yellow-400 mb-4">
+
+        Upload New Reel
+
+      </h2>
+
+
+      <input
+
+        type="file"
+
+        id="reelFileInput"
+
+        accept="video/*"
+
+        onchange="previewReel(event)"
+
+        class="mb-3 w-full"
+      >
+
+
+      <p
+        id="selectedFileName"
+
+        class="text-sm text-gray-400 mb-3"
+
+      >
+
+        No file selected
+
+      </p>
+
+
+      <textarea
+
+        id="reelCaptionInput"
+
+        placeholder="Write caption..."
+
+        class="w-full p-3 rounded-2xl bg-[#1e293b] text-white mb-4"
+
+      ></textarea>
+
+
+      <!-- LIMIT BUTTONS -->
+
+      <div class="flex gap-2 mb-4">
+
+
+        <button
+
+          id="limit15"
+
+          onclick="setReelLimit(15)"
+
+          class="limit-btn bg-yellow-400 text-black px-3 py-2 rounded-xl"
+
+        >
+          15s
+
+        </button>
+
+
+        <button
+
+          id="limit30"
+
+          onclick="setReelLimit(30)"
+
+          class="limit-btn bg-[#334155] px-3 py-2 rounded-xl"
+
+        >
+          30s
+
+        </button>
+
+
+        <button
+
+          id="limit60"
+
+          onclick="setReelLimit(60)"
+
+          class="limit-btn bg-[#334155] px-3 py-2 rounded-xl"
+        >
+  
+        60s
+     
+   </button>
+
+
+      </div>
+
+
+      <!-- ACTION BUTTONS -->
+  
+    <div class="flex gap-3">
+
+
+        <button
+          onclick="closeReelModal()"
+   
+       class="flex-1 bg-gray-700 py-3 rounded-2xl"
+        >
+    
+      Cancel
+ 
+       </button>
+
+ 
+       <button
+          onclick="uploadReel()"
+
+          class="flex-1 bg-green-600 py-3 rounded-2xl font-bold"
+        >
+
+          Post Reel
+
+        </button>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- APP JS -->
+ <!-- COMMENT MODAL -->
+<div id="commentModal" class="hidden fixed inset-0 bg-black/80 z-[999] flex items-end justify-center">
+  <div class="bg-[#1E293B] w-full max-w-lg rounded-t-3xl p-5">
+    
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-yellow-400 font-bold text-lg">💬 Comments</h2>
+      <button onclick="closeCommentModal()" class="text-gray-400 text-2xl">×</button>
+    </div>
+
+    <div id="commentList" class="space-y-3 max-h-[300px] overflow-y-auto mb-4">
+      <p class="text-gray-400 text-center text-sm">Loading...</p>
+    </div>
+
+    <div class="flex gap-2">
+      <input type="text" id="commentInput" placeholder="Write a comment..." 
+        class="flex-1 bg-[#0F172A] text-white rounded-full px-4 py-2 outline-none border border-gray-700">
+      <button onclick="submitComment()" 
+        class="bg-yellow-400 text-black px-5 rounded-full font-bold">Send</button>
+    </div>
+
+  </div>
+</div>
+ <script type="module" src="app.js"></script>
+<script>
+  function openReelModal(){ document.getElementById("reelUploadModal").classList.remove("hidden"); }
+  function closeReelModal(){ document.getElementById("reelUploadModal").classList.add("hidden"); }
+  function previewReel(e){ document.getElementById("selectedFileName").innerText = e.target.files[0]?.name || "No file"; }
+  function uploadReel(){ window.uploadReel(); }
+  function setReelLimit(s){ window.setReelLimit(s); }
+
+let activeReelId = null;
+
+function openCommentModal(reelId){
+  activeReelId = reelId;
+  document.getElementById("commentModal").classList.remove("hidden");
+  loadComments(reelId);
+}
+
+function closeCommentModal(){
+  document.getElementById("commentModal").classList.add("hidden");
+  activeReelId = null;
+}
+async function loadComments(reelId){
+  const list = document.getElementById("commentList");
+  list.innerHTML = `<p class="text-gray-400 text-center text-sm">Loading...</p>`;
+
+  // Firebase ready hone tak wait karo
+  let tries = 0;
+  while((!window.db || !window.query) && tries < 10){
+    await new Promise(r => setTimeout(r, 300));
+    tries++;
+  }
+
+  if(!window.db || !window.query){ 
+    list.innerHTML = `<p class="text-red-400 text-center text-sm">Firebase load nahi hua, dobara try karo</p>`;
+    return; 
+  }
+
+  const q = window.query(
+    window.collection(window.db, "reelComments"),
+    window.where("reelId", "==", reelId),
+    window.orderBy("createdAt", "asc")
+  );
+
+  const snap = await window.getDocs(q);
+
+  if(snap.empty){
+    list.innerHTML = `<p class="text-gray-400 text-center text-sm">No comments yet 💬</p>`;
+    return;
+  }
+
+  list.innerHTML = "";
+  snap.forEach(doc => {
+    const d = doc.data();
+    list.innerHTML += `
+    <div class="bg-[#0F172A] p-3 rounded-2xl">
+      <p class="text-yellow-400 font-bold text-sm">${d.userEmail.split("@")[0]}</p>
+      <p class="text-white text-sm">${d.text}</p>
+    </div>`;
+  });
+}
+
+async function submitComment(){
+  const input = document.getElementById("commentInput");
+  const text = input.value.trim();
+  if(!text || !activeReelId) return;
+
+  const user = window.auth.currentUser;
+  if(!user){ alert("Login Required"); return; }
+
+  await window.addDoc(window.collection(window.db, "reelComments"), {
+    reelId: activeReelId,
+    userEmail: user.email,
+    text: text,
+    createdAt: window.serverTimestamp()
+  });
+
+  await window.updateDoc(window.doc(window.db, "reels", activeReelId), {
+    comments: window.increment(1)
+  });
+
+  input.value = "";
+  loadComments(activeReelId);
+}
+</script>
+
+
+</body>
+
+</html>
